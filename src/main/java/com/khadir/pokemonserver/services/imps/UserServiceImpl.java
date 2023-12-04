@@ -1,7 +1,9 @@
 package com.khadir.pokemonserver.services.imps;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import lombok.Builder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +44,20 @@ public class UserServiceImpl implements UserService {
 	    return userRepository.save(newUser);
     }
 
+    @Override
+    public List<UserDto> findAllUsers() {
+    	List<User> users = userRepository.findAll();
+    	return users.stream().map((user) -> mapToUser(user)).collect(Collectors.toList());
+    }
+    
+    private UserDto mapToUser(User user) {
+    	UserDto userDto = UserDto.builder()
+    			.id(user.getId())
+    			.username(user.getUsername())
+    			.build();
+    	return userDto;
+    	
+    }
 
 	@Override
 	public User getUserById(Long id) {
