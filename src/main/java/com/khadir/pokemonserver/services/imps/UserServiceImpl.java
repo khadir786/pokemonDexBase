@@ -85,11 +85,12 @@ public class UserServiceImpl implements UserService {
     }
 
 
-	@Override
-	public void deleteUser(Long id) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void deleteUser(Long id) {
+        userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with: " + id));
+        userRepository.deleteById(id);
+    }
+
 
     // Implement other methods...
 }
