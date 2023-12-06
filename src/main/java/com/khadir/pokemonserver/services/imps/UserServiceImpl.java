@@ -1,6 +1,7 @@
 package com.khadir.pokemonserver.services.imps;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.khadir.pokemonserver.dtos.UserDto;
 import com.khadir.pokemonserver.exceptions.UserAlreadyExistsException;
+import com.khadir.pokemonserver.exceptions.UserNotFoundException;
 import com.khadir.pokemonserver.models.User;
 import com.khadir.pokemonserver.repos.UserRepository;
 import com.khadir.pokemonserver.services.UserService;
@@ -59,17 +61,29 @@ public class UserServiceImpl implements UserService {
     	
     }
 
-	@Override
-	public User getUserById(Long id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+    }
 
-	@Override
-	public User updateUser(UserDto userDto, Long id) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
+    @Override
+    public User updateUser(UserDto userDto, Long id) {
+        User existingUser = userRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+        
+        // Update the existing user's fields
+        existingUser.setUsername(userDto.getUsername());
+        
+        if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
+            String encodedPassword = passwordEncoder.encode(userDto.getPassword());
+            existingUser.setPassword(encodedPassword);
+        }
+        // Other fields from userDto can be updated similarly
+        return userRepository.save(existingUser);
+    }
+
 
 	@Override
 	public void deleteUser(Long id) {
