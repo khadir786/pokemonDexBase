@@ -3,6 +3,7 @@ package com.khadir.pokemonserver.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,4 +40,12 @@ public class AuthController {
 				.build();
         return userDto;
     }
+	
+	@PostMapping("/login")
+	public ResponseEntity<?> loginUser(@RequestBody UserDto userDto, Authentication authentication) {
+	    // Can use 'authentication' to access the currently authenticated user's details
+	    // Implement any additional logic needed post-authentication
+	    return ResponseEntity.ok().body("User logged in successfully");
+	}
+
 }
