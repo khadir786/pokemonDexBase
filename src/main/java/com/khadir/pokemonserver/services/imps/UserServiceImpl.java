@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 	    		.build();
 
 	    // Additional fields can be set based on User class and UserDto
-	    Role role = roleRepository.findByName("USER");
+	    Role role = roleRepository.findByName("ROLE_USER").get();
 	    newUser.setRoles(Arrays.asList(role));
 	    return userRepository.save(newUser);
     }
@@ -95,6 +95,17 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long id) {
         userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with: " + id));
         userRepository.deleteById(id);
+    }
+
+	@Override
+	public void addRoleToUser(String username, String roleName) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        user.getRoles().add(role);
+        userRepository.save(user);
     }
 
 
