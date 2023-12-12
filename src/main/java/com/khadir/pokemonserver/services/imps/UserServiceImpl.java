@@ -53,21 +53,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAllUsers() {
-    	List<User> users = userRepository.findAll();
-    	return users.stream().map((user) -> mapToUser(user)).collect(Collectors.toList());
-    }
-    
-    private UserDto mapToUser(User user) {
-    	UserDto userDto = UserDto.builder()
-    			.id(user.getId())
-    			.username(user.getUsername())
-    			.build();
-    	return userDto;
-    	
-    }
-
-    @Override
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
@@ -97,17 +82,19 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-	@Override
-	public void addRoleToUser(String username, String roleName) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new RuntimeException("Role not found"));
-
-        user.getRoles().add(role);
-        userRepository.save(user);
+    @Override
+    public List<UserDto> findAllUsers() {
+    	List<User> users = userRepository.findAll();
+    	return users.stream().map((user) -> mapToUser(user)).collect(Collectors.toList());
     }
-
-
+    
+    private UserDto mapToUser(User user) {
+    	UserDto userDto = UserDto.builder()
+    			.id(user.getId())
+    			.username(user.getUsername())
+    			.build();
+    	return userDto;
+    	
+    }
     // Implement other methods...
 }
