@@ -47,8 +47,9 @@ public class SecurityConfig {
 			.csrf(csrf -> csrf.disable())
 			.authorizeHttpRequests(authorize -> 
 			authorize
-					.requestMatchers("/api/auth/register", "/api/users", "/api/auth/login").permitAll()
-					.anyRequest().authenticated() // All other requests require authentication
+//					.requestMatchers("/api/auth/register", "/api/users", "/api/auth/login", "/api/**").permitAll()
+					.anyRequest().permitAll()
+//					.anyRequest().authenticated() // All other requests require authentication
 			)
 			.formLogin(form -> form
 					.loginProcessingUrl("/api/auth/login")
