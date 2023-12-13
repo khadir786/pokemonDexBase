@@ -40,13 +40,13 @@ public class UserController {
 	
     @GetMapping(value = "/{userId}")
     public ResponseEntity<?> getUser(@PathVariable Long userId) {
-    	User user = userService.getUserById(userId);
+    	UserDto user = userService.getUserById(userId);
     	return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PutMapping("/{userId}")
+    @PutMapping(value = "/{userId}")
     public ResponseEntity<?> updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
-    	User user = userService.updateUser(userDto, userId);
+    	UserDto user = userService.updateUser(userDto, userId);
 		return new ResponseEntity<>(user, HttpStatus.OK);
     }
     

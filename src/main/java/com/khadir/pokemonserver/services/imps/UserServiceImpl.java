@@ -21,80 +21,102 @@ import com.khadir.pokemonserver.services.UserService;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
+	private final UserRepository userRepository;
+	private final RoleRepository roleRepository;
+	private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
+	@Autowired
+	public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
+			RoleRepository roleRepository) {
+		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+		this.passwordEncoder = passwordEncoder;
+	}
 
-    @Override
-    public User registerNewUser(UserDto userDto) throws UserAlreadyExistsException {
-    	String username = userDto.getUsername();
+	@Override
+	public User registerNewUser(UserDto userDto) throws UserAlreadyExistsException {
+		String username = userDto.getUsername();
 		if (userRepository.findByUsername(username).isPresent()) {
 			throw new UserAlreadyExistsException("There is already a user with the username: " + userDto.getUsername());
 		}
-    	
+
 		// Creating a new user instance
 		String encodedPassword = passwordEncoder.encode(userDto.getPassword());
-	    User newUser = User.builder()
-	    		.username(username)
-	    		.password(encodedPassword)
-	    		.build();
+		User newUser = User.builder().username(username).password(encodedPassword).build();
 
-	    // Additional fields can be set based on User class and UserDto
-	    Role role = roleRepository.findByName("ROLE_USER").get();
-	    newUser.setRoles(Arrays.asList(role));
-	    return userRepository.save(newUser);
-    }
+		// Additional fields can be set based on User class and UserDto
+		Role role = roleRepository.findByName("ROLE_USER").get();
+		newUser.setRoles(Arrays.asList(role));	
+		return userRepository.save(newUser);
+	}
 
-    @Override
-    public User getUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-    }
+	@Override
+	public UserDto getUserById(Long id) {
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+
+		UserDto userDto = mapToUser(user);
+		// Convert User to UserDto
+		return userDto;
+	}
+
+	@Override
+	public UserDto updateUser(UserDto newUser, Long id) {
+	    User existingUser = userRepository.findById(id)
+	            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+
+	    // Fetch the potentially existing user with the new username
+	    Optional<User> userWithNewUsername = userRepository.findByUsername(newUser.getUsername());
+
+	    // Check if the new username already exists and does not belong to the current user
+	    if (userWithNewUsername.isPresent() && !userWithNewUsername.get().getId().equals(id)) {
+	        throw new UserAlreadyExistsException("There is already a user with the username: " + newUser.getUsername());
+	    }
+
+	    // Update the existing user's fields
+	    if (newUser.getUsername() != null && !newUser.getUsername().isEmpty()) {
+	        existingUser.setUsername(newUser.getUsername());
+	    }
+	    if (newUser.getPassword() != null && !newUser.getPassword().isEmpty()) {
+	        String encodedPassword = passwordEncoder.encode(newUser.getPassword());
+	        existingUser.setPassword(encodedPassword);
+	    }
+
+	    // Other fields from newUser can be updated similarly
+
+	    userRepository.save(existingUser);
+	    return mapToUser(existingUser);
+	}
 
 
-    @Override
-    public User updateUser(UserDto userDto, Long id) {
-        User existingUser = userRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-        
-        // Update the existing user's fields
-        existingUser.setUsername(userDto.getUsername());
-        
-        if (userDto.getPassword() != null && !userDto.getPassword().isEmpty()) {
-            String encodedPassword = passwordEncoder.encode(userDto.getPassword());
-            existingUser.setPassword(encodedPassword);
-        }
-        // Other fields from userDto can be updated similarly
-        return userRepository.save(existingUser);
-    }
+	@Override
+	public void deleteUser(Long id) {
+		User user = userRepository.findById(id)
+				.orElseThrow(() -> new UserNotFoundException("User not found with: " + id));
 
+		// manually clear the roles to avoid constraint violation
+		user.getRoles().clear();
+		userRepository.save(user);
 
-    @Override
-    public void deleteUser(Long id) {
-        userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with: " + id));
-        userRepository.deleteById(id);
-    }
+		userRepository.deleteById(id);
+	}
 
-    @Override
-    public List<UserDto> findAllUsers() {
-    	List<User> users = userRepository.findAll();
-    	return users.stream().map((user) -> mapToUser(user)).collect(Collectors.toList());
-    }
-    
-    private UserDto mapToUser(User user) {
-    	UserDto userDto = UserDto.builder()
-    			.id(user.getId())
-    			.username(user.getUsername())
-    			.build();
-    	return userDto;
-    	
-    }
-    // Implement other methods...
+	@Override
+	public List<UserDto> findAllUsers() {
+		List<User> users = userRepository.findAll();
+		return users.stream().map((user) -> mapToUser(user)).collect(Collectors.toList());
+	}
+
+	private UserDto mapToUser(User user) {
+		UserDto userDto = null;
+		if (user.getPassword() != null) {
+			userDto = UserDto.builder().id(user.getId()).username(user.getUsername()).build();
+			return userDto;
+		}
+		
+		userDto = UserDto.builder().id(user.getId()).username(user.getUsername()).password(user.getPassword()).build();
+		return userDto;
+
+	}
+	// Implement other methods...
 }
