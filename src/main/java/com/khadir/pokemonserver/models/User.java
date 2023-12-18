@@ -40,6 +40,10 @@ public class User {
     private String username;
     @NotEmpty
 	private String password;
+    
+    private String avatar;
+
+    private String partnerPokemon;
 	
 	@CreationTimestamp
 	private LocalDateTime createdOn;
