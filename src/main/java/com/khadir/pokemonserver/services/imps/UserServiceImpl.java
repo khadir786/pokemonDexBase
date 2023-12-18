@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.khadir.pokemonserver.dtos.UserDto;
+import com.khadir.pokemonserver.dtos.UserResponseDto;
 import com.khadir.pokemonserver.exceptions.UserAlreadyExistsException;
 import com.khadir.pokemonserver.exceptions.UserNotFoundException;
 import com.khadir.pokemonserver.models.Role;
@@ -51,41 +52,46 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDto getUserById(Long id) {
+	public UserResponseDto getUserById(Long id) {
 		User user = userRepository.findById(id)
 				.orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
 
-		UserDto userDto = mapToUser(user);
+		UserResponseDto userDto = responseMapToUser(user);
 		// Convert User to UserDto
 		return userDto;
 	}
 
 	@Override
-	public UserDto updateUser(UserDto newUser, Long id) {
+	public UserResponseDto updateUser(UserDto newUser, Long id) {
 	    User existingUser = userRepository.findById(id)
 	            .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
 
-	    // Fetch the potentially existing user with the new username
+	    		// Fetch the potentially existing user with the new username
 	    Optional<User> userWithNewUsername = userRepository.findByUsername(newUser.getUsername());
 
-	    // Check if the new username already exists and does not belong to the current user
+	   			// Check if the new username already exists and does not belong to the current user
 	    if (userWithNewUsername.isPresent() && !userWithNewUsername.get().getId().equals(id)) {
 	        throw new UserAlreadyExistsException("There is already a user with the username: " + newUser.getUsername());
 	    }
 
-	    // Update the existing user's fields
+	    		// Update the existing user's fields
+	    		// Check if field isn't null and isn't empty
 	    if (newUser.getUsername() != null && !newUser.getUsername().isEmpty()) {
 	        existingUser.setUsername(newUser.getUsername());
+	    }
+	    if (newUser.getAvatar() != null && !newUser.getAvatar().isEmpty()) {
+	    	existingUser.setAvatar(newUser.getAvatar());
+	    }
+	    if (newUser.getPartnerPokemon() != null && !newUser.getPartnerPokemon().isEmpty()) {
+	    	existingUser.setPartnerPokemon(newUser.getPartnerPokemon());
 	    }
 	    if (newUser.getPassword() != null && !newUser.getPassword().isEmpty()) {
 	        String encodedPassword = passwordEncoder.encode(newUser.getPassword());
 	        existingUser.setPassword(encodedPassword);
 	    }
 
-	    // Other fields from newUser can be updated similarly
-
 	    userRepository.save(existingUser);
-	    return mapToUser(existingUser);
+	    return responseMapToUser(existingUser);
 	}
 
 
@@ -102,21 +108,21 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserDto> findAllUsers() {
+	public List<UserResponseDto> findAllUsers() {
 		List<User> users = userRepository.findAll();
-		return users.stream().map((user) -> mapToUser(user)).collect(Collectors.toList());
+		return users.stream().map((user) -> responseMapToUser(user)).collect(Collectors.toList());
 	}
 
-	private UserDto mapToUser(User user) {
-		UserDto userDto = null;
-		if (user.getPassword() != null) {
-			userDto = UserDto.builder().id(user.getId()).username(user.getUsername()).build();
-			return userDto;
-		}
-		
-		userDto = UserDto.builder().id(user.getId()).username(user.getUsername()).password(user.getPassword()).build();
+
+	private UserResponseDto responseMapToUser(User user) {
+		UserResponseDto userDto = null;
+		userDto = UserResponseDto.builder()
+				.id(user.getId())
+				.username(user.getUsername())
+				.avatar(user.getAvatar())		
+				.partnerPokemon(user.getPartnerPokemon())
+				.build();
 		return userDto;
-
+		
 	}
-	// Implement other methods...
 }

@@ -9,9 +9,9 @@ import com.khadir.pokemonserver.models.User;
 
 public interface UserService {
     User registerNewUser(UserDto userDto) throws UserAlreadyExistsException;
-    UserDto getUserById(Long id);
-    UserDto updateUser(UserDto userDto, Long id);
+    UserResponseDto getUserById(Long id);
+    UserResponseDto updateUser(UserDto userDto, Long id);
     void deleteUser(Long id);
-    List<UserDto> findAllUsers();
+    List<UserResponseDto> findAllUsers();
 }
 

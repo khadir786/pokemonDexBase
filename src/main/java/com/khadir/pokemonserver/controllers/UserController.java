@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.khadir.pokemonserver.dtos.UserDto;
+import com.khadir.pokemonserver.dtos.UserResponseDto;
 import com.khadir.pokemonserver.exceptions.UserAlreadyExistsException;
 import com.khadir.pokemonserver.models.User;
 import com.khadir.pokemonserver.services.UserService;
@@ -33,20 +34,20 @@ public class UserController {
 	
 	
 	@GetMapping("/users")
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        List<UserDto> users = userService.findAllUsers();
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+        List<UserResponseDto> users = userService.findAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 	
     @GetMapping(value = "/{userId}")
     public ResponseEntity<?> getUser(@PathVariable Long userId) {
-    	UserDto user = userService.getUserById(userId);
+    	UserResponseDto user = userService.getUserById(userId);
     	return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PutMapping(value = "/{userId}")
     public ResponseEntity<?> updateUser(@PathVariable Long userId, @RequestBody UserDto userDto) {
-    	UserDto user = userService.updateUser(userDto, userId);
+    	UserResponseDto user = userService.updateUser(userDto, userId);
 		return new ResponseEntity<>(user, HttpStatus.OK);
     }
     
