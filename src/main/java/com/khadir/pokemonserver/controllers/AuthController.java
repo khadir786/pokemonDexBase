@@ -1,15 +1,20 @@
 package com.khadir.pokemonserver.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionInformation;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.khadir.pokemonserver.config.handlers.CustomAuthenticationSuccessHandler;
 import com.khadir.pokemonserver.dtos.UserDto;
 import com.khadir.pokemonserver.exceptions.UserAlreadyExistsException;
 import com.khadir.pokemonserver.models.User;
@@ -51,12 +56,28 @@ public class AuthController {
 	    return ResponseEntity.ok().body("User logged in successfully");
 	}
 
+	@Autowired
+	private SessionRegistry sessionRegistry;
+
 	@PostMapping("/logout")
-	public ResponseEntity<?> logout(HttpServletRequest request) {
+	public ResponseEntity<?> logout(HttpServletRequest request, Authentication authentication) {
+		// Retrieve all sessions for the current user
+	    List<SessionInformation> userSessions = sessionRegistry.getAllSessions(authentication.getPrincipal(), false);
+
+	    // Expire all sessions
+	    for (SessionInformation session : userSessions) {
+	        session.expireNow();
+	        sessionRegistry.removeSessionInformation(session.getSessionId());
+	    }
+	    
+	    String sessionId = request.getSession().getId();
+	    String username = (String) request.getSession().getAttribute("username");
 	    request.getSession().invalidate();
 	    SecurityContextHolder.clearContext();
-	    return ResponseEntity.ok().build();
+	    CustomAuthenticationSuccessHandler.removeActiveSession(sessionId);
+	    return ResponseEntity.ok().body("User: " + username + " logged out");
 	}
+
 
 	
 }
