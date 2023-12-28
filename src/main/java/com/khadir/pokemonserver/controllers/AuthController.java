@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,8 @@ import com.khadir.pokemonserver.dtos.UserDto;
 import com.khadir.pokemonserver.exceptions.UserAlreadyExistsException;
 import com.khadir.pokemonserver.models.User;
 import com.khadir.pokemonserver.services.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -48,4 +51,12 @@ public class AuthController {
 	    return ResponseEntity.ok().body("User logged in successfully");
 	}
 
+	@PostMapping("/logout")
+	public ResponseEntity<?> logout(HttpServletRequest request) {
+	    request.getSession().invalidate();
+	    SecurityContextHolder.clearContext();
+	    return ResponseEntity.ok().build();
+	}
+
+	
 }
