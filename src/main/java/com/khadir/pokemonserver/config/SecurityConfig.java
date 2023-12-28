@@ -9,6 +9,8 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -18,9 +20,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.khadir.pokemonserver.config.UserConfigs.ActiveUserListener;
 import com.khadir.pokemonserver.config.handlers.CustomAuthenticationFailureHandler;
 import com.khadir.pokemonserver.config.handlers.CustomAuthenticationSuccessHandler;
 import com.khadir.pokemonserver.services.CustomUserDetailsService;
+
+import jakarta.servlet.http.HttpSessionListener;
 
 
 
@@ -45,6 +50,7 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain FilterChain(HttpSecurity http) throws Exception {
 		http
+		
 			.cors(cors -> cors.configurationSource(myWebsiteConfigurationSource()))
 			.csrf(csrf -> csrf.disable())
 			.authorizeHttpRequests(authorize -> 
@@ -58,9 +64,21 @@ public class SecurityConfig {
 					.loginProcessingUrl("/api/auth/login")
 					.successHandler(successHandler)
 	                .failureHandler(failureHandler)
-					.permitAll());
+					.permitAll())
+			.sessionManagement(session -> session
+					.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+			.logout(logout -> logout
+		            .deleteCookies("JSESSIONID")
+		        );
+			;
+			
 		return http.build();
 	}
+	
+	@Bean
+    public HttpSessionListener httpSessionListener() {
+        return new ActiveUserListener();
+    }
 	
 	@Bean
 	CorsConfigurationSource myWebsiteConfigurationSource() {
