@@ -74,8 +74,8 @@ public class AuthController {
 
 			request.getSession().invalidate();
 			SecurityContextHolder.clearContext();
-			CustomAuthenticationSuccessHandler.removeActiveSession(sessionId);
-			return ResponseEntity.ok().body("User: " + username + " logged out");
+			CustomAuthenticationSuccessHandler.removeActiveSessions(sessionId);
+			return ResponseEntity.ok().body("User: " + username + " (Session ID: " + sessionId + ") logged out");
 		} catch (NullPointerException e) {
 			return new ResponseEntity<>("Cannot log out because user isn't logged in", HttpStatus.BAD_REQUEST);
 		}
