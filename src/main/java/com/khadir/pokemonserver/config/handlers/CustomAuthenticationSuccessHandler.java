@@ -50,9 +50,21 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         return activeSessions;
     }
     
-    public static void removeActiveSession(String sessionId) {
-        activeSessions.remove(sessionId);
+    public static void removeActiveSessions(String sessionId) {
+        String usernameToRemove = activeSessions.get(sessionId);
+        
+        // Check if the sessionId exists in the map
+        if (usernameToRemove != null) {
+            // Iterate through the entries and remove matching entries
+            activeSessions.forEach((key, value) -> {
+                if (value.equals(usernameToRemove)) {
+                    activeSessions.remove(key);
+                }
+            });
+        }
     }
+
+
 
 }
 
