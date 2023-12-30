@@ -19,9 +19,7 @@ import com.khadir.pokemonserver.config.handlers.CustomAuthenticationSuccessHandl
 public class AdminController {
 	
 	@Autowired
-	private SessionRegistry sessionRegistry;
-
-	
+	private SessionRegistry sessionRegistry;	
 	
 	@GetMapping("/active-sessions")
 //	@PreAuthorize("hasRole('ADMIN')")
@@ -41,7 +39,8 @@ public class AdminController {
 	            }
 	        }
 	    }
-
+	    
+//	    activeUsers.add(CustomAuthenticationSuccessHandler.getActiveSessions().toString()); // keep track of each indivdual's instances
 	    return activeUsers;
 	}
 
