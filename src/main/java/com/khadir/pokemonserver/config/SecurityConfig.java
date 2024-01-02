@@ -22,6 +22,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.khadir.pokemonserver.config.handlers.CustomAccessDeniedHandler;
+import com.khadir.pokemonserver.config.handlers.CustomAuthenticationEntryPoint;
 import com.khadir.pokemonserver.config.handlers.CustomAuthenticationFailureHandler;
 import com.khadir.pokemonserver.config.handlers.CustomAuthenticationSuccessHandler;
 import com.khadir.pokemonserver.services.CustomUserDetailsService;
@@ -41,6 +43,10 @@ public class SecurityConfig {
     private CustomAuthenticationSuccessHandler successHandler;
     @Autowired
     private CustomAuthenticationFailureHandler failureHandler;
+    @Autowired
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    @Autowired
+    private CustomAccessDeniedHandler customAccessDeniedHandler;
 	
 	@Autowired
 	public SecurityConfig(CustomUserDetailsService userDetailsService) {
@@ -55,11 +61,16 @@ public class SecurityConfig {
 			.csrf(csrf -> csrf.disable())
 			.authorizeHttpRequests(authorize -> 
 			authorize
-//					.requestMatchers("/api/auth/register", "/api/users", "/api/auth/login", "/api/**").permitAll()
+					.requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
 					.requestMatchers("/admin/**").hasRole("ADMIN")
-					.anyRequest().permitAll()
-//					.anyRequest().authenticated() // All other requests require authentication
+					.anyRequest().authenticated() // All other requests require authentication
+//					.anyRequest().permitAll()
 			)
+			.exceptionHandling(exception -> 
+			exception
+					.authenticationEntryPoint(customAuthenticationEntryPoint)
+					.accessDeniedHandler(customAccessDeniedHandler)
+					)
 			.formLogin(form -> form
 					.loginProcessingUrl("/api/auth/login")
 					.successHandler(successHandler)
@@ -69,7 +80,7 @@ public class SecurityConfig {
 					.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
 					.maximumSessions(1)
 					.sessionRegistry(sessionRegistry())
-)
+					)
 			.logout(logout -> logout
 		            .deleteCookies("JSESSIONID")
 		        );
@@ -85,6 +96,8 @@ public class SecurityConfig {
 		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
 		configuration.setAllowedHeaders(Arrays.asList("*"));
+		configuration.setAllowCredentials(true);
+		
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
