@@ -22,7 +22,7 @@ public class AdminController {
 	private SessionRegistry sessionRegistry;	
 	
 	@GetMapping("/active-sessions")
-//	@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public List<String> getActiveSessions() {
 	    List<Object> allPrincipals = sessionRegistry.getAllPrincipals();
 	    List<String> activeUsers = new ArrayList<>();
