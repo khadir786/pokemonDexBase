@@ -113,7 +113,15 @@ public class UserServiceImpl implements UserService {
 		return users.stream().map((user) -> responseMapToUser(user)).collect(Collectors.toList());
 	}
 
-
+	@Override
+	public UserResponseDto getUserByUsername(String username) {
+		User user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
+		
+		UserResponseDto userDto = responseMapToUser(user);
+		return userDto;
+	}
+	
 	private UserResponseDto responseMapToUser(User user) {
 		UserResponseDto userDto = null;
 		userDto = UserResponseDto.builder()
@@ -125,4 +133,6 @@ public class UserServiceImpl implements UserService {
 		return userDto;
 		
 	}
+
+	
 }

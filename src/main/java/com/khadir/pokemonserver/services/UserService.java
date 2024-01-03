@@ -13,5 +13,6 @@ public interface UserService {
     UserResponseDto updateUser(UserDto userDto, Long id);
     void deleteUser(Long id);
     List<UserResponseDto> findAllUsers();
+    UserResponseDto getUserByUsername(String username);
 }
 
