@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.khadir.pokemonserver.config.handlers.CustomAuthenticationSuccessHandler;
 import com.khadir.pokemonserver.dtos.UserDto;
+import com.khadir.pokemonserver.dtos.UserResponseDto;
 import com.khadir.pokemonserver.exceptions.UserAlreadyExistsException;
 import com.khadir.pokemonserver.exceptions.UserNotFoundException;
 import com.khadir.pokemonserver.models.User;
@@ -80,6 +82,16 @@ public class AuthController {
 			return new ResponseEntity<>("Cannot log out because user isn't logged in", HttpStatus.BAD_REQUEST);
 		}
 
+	}
+
+	// get logged in user's info (as logged in user)
+	@GetMapping("/userinfo")
+	public ResponseEntity<?> getUserInfo() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String username = authentication.getName();
+		UserResponseDto user = userService.getUserByUsername(username);
+
+		return new ResponseEntity<>(user, HttpStatus.OK);
 	}
 
 }
