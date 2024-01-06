@@ -1,19 +1,14 @@
 package com.khadir.pokemonserver.dtos;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class UserDto {
-	private Long id;
-	@NotEmpty
+public class UserResponseDto {
+    private Long id;
     private String username;
-	@NotEmpty
-	private String password;
-	private String avatar;
+    private String avatar;
     private String partnerPokemon;
+    // Add other fields that you want to include in the response
 }
-
-
