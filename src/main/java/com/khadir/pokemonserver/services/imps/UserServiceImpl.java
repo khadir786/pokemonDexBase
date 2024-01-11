@@ -82,6 +82,9 @@ public class UserServiceImpl implements UserService {
 	    if (newUser.getAvatar() != null && !newUser.getAvatar().isEmpty()) {
 	    	existingUser.setAvatar(newUser.getAvatar());
 	    }
+	    if (newUser.getDob() != null && !newUser.getDob().toString().isEmpty()) {
+	    	existingUser.setDob(newUser.getDob());
+	    }
 	    if (newUser.getPartnerPokemon() != null && !newUser.getPartnerPokemon().isEmpty()) {
 	    	existingUser.setPartnerPokemon(newUser.getPartnerPokemon());
 	    }
@@ -127,7 +130,8 @@ public class UserServiceImpl implements UserService {
 		userDto = UserResponseDto.builder()
 				.id(user.getId())
 				.username(user.getUsername())
-				.avatar(user.getAvatar())		
+				.avatar(user.getAvatar())
+				.dob(user.getDob())
 				.partnerPokemon(user.getPartnerPokemon())
 				.build();
 		return userDto;
