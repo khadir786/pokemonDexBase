@@ -88,6 +88,12 @@ public class UserServiceImpl implements UserService {
 	    if (newUser.getPartnerPokemon() != null && !newUser.getPartnerPokemon().isEmpty()) {
 	    	existingUser.setPartnerPokemon(newUser.getPartnerPokemon());
 	    }
+	    if (newUser.getRegion() != null && !newUser.getRegion().isEmpty()) {
+	    	existingUser.setRegion(newUser.getRegion());
+	    }
+	    if (newUser.getCardImage() != null && !newUser.getCardImage().isEmpty()) {
+	    	existingUser.setCardImage(newUser.getCardImage());
+	    }
 	    if (newUser.getPassword() != null && !newUser.getPassword().isEmpty()) {
 	        String encodedPassword = passwordEncoder.encode(newUser.getPassword());
 	        existingUser.setPassword(encodedPassword);
@@ -133,6 +139,8 @@ public class UserServiceImpl implements UserService {
 				.avatar(user.getAvatar())
 				.dob(user.getDob())
 				.partnerPokemon(user.getPartnerPokemon())
+				.region(user.getRegion())
+				.cardImage(user.getCardImage())
 				.build();
 		return userDto;
 		

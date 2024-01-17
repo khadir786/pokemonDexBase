@@ -17,9 +17,11 @@ public class UserDto {
 	@NotEmpty
 	private String password;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-	private LocalDate dob;
 	private String avatar;
+	private LocalDate dob;
+	private String region;
     private String partnerPokemon;
+    private String cardImage;
 }
 
 

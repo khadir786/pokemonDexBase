@@ -47,6 +47,10 @@ public class User {
     private String avatar;
 
     private String partnerPokemon;
+    
+    private String region;
+    
+    private String cardImage;
 	
 	@CreationTimestamp
 	private LocalDateTime createdOn;
