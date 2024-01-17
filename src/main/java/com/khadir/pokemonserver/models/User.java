@@ -1,5 +1,6 @@
 package com.khadir.pokemonserver.models;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,9 +42,15 @@ public class User {
     @NotEmpty
 	private String password;
     
+    private LocalDate dob;
+    
     private String avatar;
 
     private String partnerPokemon;
+    
+    private String region;
+    
+    private String cardImage;
 	
 	@CreationTimestamp
 	private LocalDateTime createdOn;

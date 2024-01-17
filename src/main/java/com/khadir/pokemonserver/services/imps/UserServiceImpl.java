@@ -82,8 +82,17 @@ public class UserServiceImpl implements UserService {
 	    if (newUser.getAvatar() != null && !newUser.getAvatar().isEmpty()) {
 	    	existingUser.setAvatar(newUser.getAvatar());
 	    }
+	    if (newUser.getDob() != null && !newUser.getDob().toString().isEmpty()) {
+	    	existingUser.setDob(newUser.getDob());
+	    }
 	    if (newUser.getPartnerPokemon() != null && !newUser.getPartnerPokemon().isEmpty()) {
 	    	existingUser.setPartnerPokemon(newUser.getPartnerPokemon());
+	    }
+	    if (newUser.getRegion() != null && !newUser.getRegion().isEmpty()) {
+	    	existingUser.setRegion(newUser.getRegion());
+	    }
+	    if (newUser.getCardImage() != null && !newUser.getCardImage().isEmpty()) {
+	    	existingUser.setCardImage(newUser.getCardImage());
 	    }
 	    if (newUser.getPassword() != null && !newUser.getPassword().isEmpty()) {
 	        String encodedPassword = passwordEncoder.encode(newUser.getPassword());
@@ -127,8 +136,11 @@ public class UserServiceImpl implements UserService {
 		userDto = UserResponseDto.builder()
 				.id(user.getId())
 				.username(user.getUsername())
-				.avatar(user.getAvatar())		
+				.avatar(user.getAvatar())
+				.dob(user.getDob())
 				.partnerPokemon(user.getPartnerPokemon())
+				.region(user.getRegion())
+				.cardImage(user.getCardImage())
 				.build();
 		return userDto;
 		
